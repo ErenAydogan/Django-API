@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class WatchlistConfig(AppConfig):
+class WatchlistAppConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'watchlist'
+    name = 'watchlist_app'
