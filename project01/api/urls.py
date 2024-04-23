@@ -4,6 +4,7 @@ from . import views
 
 
 urlpatterns = [
-    path('movie/', views.MovieListAV.as_view(), name='movie-list'),
-    path('movie/<int:pk>/', views.MovieDetailAV.as_view(), name='movie-detail'),
+    path('watch/', views.WatchListAV.as_view(), name='watch-list'),
+    path('watch/<int:pk>/', views.WatchDetailAV.as_view(), name='watch-detail'),
+    path('stream/', views.StreamPlatformAV.as_view(), name='stream')
 ]
