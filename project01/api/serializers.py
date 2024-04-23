@@ -8,23 +8,17 @@ class StreamPlatformSerializer(serializers.ModelSerializer):
 
 class WatchListSerializer(serializers.ModelSerializer):
     #Adding another field
-    len_name = serializers.SerializerMethodField()
+    #len_name = serializers.SerializerMethodField()
 
     class Meta:
         model = WatchList
         fields = "__all__"
         ##fields = ['active', 'name', 'description']
         #exclude = ['id']
-
-    def get_len_name(self, object): #get_{field_name}
-        return len(object.name)
-
-
-
-
-
-
 """
+    def get_len_name(self, object): #get_{field_name}
+        return len(object.title)
+
 def name_length(value):
     if len(value) < 2:
         raise serializers.ValidationError("Name is too short!")
