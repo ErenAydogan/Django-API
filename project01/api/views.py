@@ -20,8 +20,6 @@ class StreamPlatformAV(APIView):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
-        
-
 
 class WatchListAV(APIView):
     def get(self,request):
@@ -37,6 +35,33 @@ class WatchListAV(APIView):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+class SteamPlatformDetailAV(APIView):
+    def get(self, request, pk):
+        try:
+            platform = StreamPlatform.objects.get(pk=pk)
+        except StreamPlatform.DoesNotExist:
+            return Response({"Error":"Not Found!"}, status=status.HTTP_204_NO_CONTENT)
+        serializer = StreamPlatformSerializer(platform)
+        return Response(serializer.data)
+    
+    def put(self, request, pk):
+        try:
+            platform = StreamPlatform.objects.get(pk=pk)
+        except StreamPlatform.DoesNotExist:
+            return Response({"Error":"Not Found!"}, status=status.HTTP_204_NO_CONTENT)
+        serializer = StreamPlatformSerializer(platform, data=request.data)
+        if serializer.is_valid():
+            return Response(serializer.data)
+        else:
+            return Response(serializer.error, status=status.HTTP_400_BAD_REQUEST)
+        
+    def delete(self, request, pk):
+        try:
+            platform=StreamPlatform.objects.get(pk=pk)
+        except StreamPlatform.DoesNotExist:
+            return Response({"Error":"Not Found"}, status=status.HTTP_204_NO_CONTENT)
+        movie.delete()
+        return Response({'success':"The item is deleted"}, status=status.HTTP_204_NO_CONTENT)
 
 class WatchDetailAV(APIView):
     def get(self,request, pk):
