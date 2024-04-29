@@ -51,6 +51,7 @@ class SteamPlatformDetailAV(APIView):
             return Response({"Error":"Not Found!"}, status=status.HTTP_204_NO_CONTENT)
         serializer = StreamPlatformSerializer(platform, data=request.data)
         if serializer.is_valid():
+            serializer.save()
             return Response(serializer.data)
         else:
             return Response(serializer.error, status=status.HTTP_400_BAD_REQUEST)
