@@ -56,9 +56,12 @@ def registration_view(request):
 class ReviewCreate(generics.CreateAPIView):
     serializer_class = ReviewSerializer
     queryset = Review.objects.all()
-    permission_classes = [IsReviewUserOrReadOnly]
+    permission_classes = [  IsReviewUserOrReadOnly]
 
     def perform_create(self, serializer):
+        if not self.request.user.is_authenticated:
+            raise PermissionError('You need to be logged in to create a review.')
+    
         pk = self.kwargs.get('pk')
         try:
             watchlist = WatchList.objects.get(pk=pk)
