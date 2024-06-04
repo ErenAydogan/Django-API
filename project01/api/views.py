@@ -1,7 +1,7 @@
 from django.shortcuts                   import      get_object_or_404
 from rest_framework.decorators          import      api_view
 
-from rest_framework.permissions         import      IsAuthenticated, AllowAny, IsAdminUser,IsAuthenticatedOrReadOnly
+#from rest_framework.permissions         import      IsAuthenticated, AllowAny, IsAdminUser,IsAuthenticatedOrReadOnly
 from .permission                        import      IsReviewUserOrReadOnly, IsAdminOrReadOnly
 
 from rest_framework.views               import      APIView
@@ -13,12 +13,19 @@ from rest_framework.authtoken.models    import      Token
 from rest_framework                     import      generics
 from rest_framework                     import      viewsets
 
+#from rest_framework_simplejwt.tokens    import      RefreshToken
+
 from watchlist_app.models               import      WatchList, StreamPlatform, Review
 from .serializers                       import      WatchListSerializer, StreamPlatformSerializer, ReviewSerializer, RegistrationSerializer
 
 #from rest_framework                    import      mixins
 #from rest_framework.decorators         import      api_view
 
+from rest_framework.throttling          import      ScopedRateThrottle, UserRateThrottle, AnonRateThrottle
+from .throttling                        import      ReviewCreateThrottle, ReviewListThrottle
+
+from django_filters.rest_framework      import      DjangoFilterBackend
+from rest_framework                     import      filters
 
 
 
@@ -47,16 +54,40 @@ def registration_view(request):
             token = Token.objects.get(user=account).key
             data['token'] = token
 
+            """
+            refresh = RefreshToken.for_user(account)
+            data['token'] = {
+                'refresh' : str(refresh),
+                'access' : str(refresh.access_token),
+            }
+            """
+
         else:
             data = serializer.errors
 
         return Response(data)
 
 
+
+class UserReview(generics.ListAPIView):
+    serializer_class = ReviewSerializer
+
+    def get_queryset(self):
+        username = self.request.query_params.get('username', None)
+        return Review.objects.filter(review_user__username=username)
+
+    """
+    def get_queryset(self):
+        username = self.kwargs['username']
+        return Review.objects.filter(review_user__username=username)
+    """ 
+    
+
 class ReviewCreate(generics.CreateAPIView):
     serializer_class = ReviewSerializer
     queryset = Review.objects.all()
-    permission_classes = [  IsReviewUserOrReadOnly]
+    permission_classes = [IsReviewUserOrReadOnly]
+    throttle_classes = [ReviewCreateThrottle]
 
     def perform_create(self, serializer):
         if not self.request.user.is_authenticated:
@@ -85,12 +116,13 @@ class ReviewCreate(generics.CreateAPIView):
         serializer.save(watchlist=watchlist, review_user=review_user)
 
 
-
-
 class ReviewList(generics.ListAPIView):
     #queryset = Review.objects.all()
     serializer_class = ReviewSerializer
-    #permission_classes = [IsReviewUserOrReadOnly]
+    # permission_classes = [IsAuthenticated]
+    throttle_classes = [ReviewListThrottle]
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['review_user__username', 'active']
 
     def get_queryset(self):
         pk = self.kwargs['pk']
@@ -101,10 +133,9 @@ class ReviewDetails(generics.RetrieveUpdateDestroyAPIView):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
     permission_classes = [IsReviewUserOrReadOnly]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = 'review-detail'
     
-
-
-
 
 """
 class ReviewList(mixins.ListModelMixin, mixins.CreateModelMixin, generics.GenericAPIView):
@@ -248,6 +279,11 @@ class WatchDetailAV(APIView):
         movie.delete()
         return Response ({'success':"The item is deleted"}, status=status.HTTP_204_NO_CONTENT)
 
+class WatchListGV(generics.ListAPIView):
+    queryset = WatchList.objects.all()
+    serializer_class = WatchListSerializer
+    filter_backends = [filters.OrderingFilter]
+    search_fields = ['avg_rating', 'title']
 
 
 

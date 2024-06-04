@@ -13,6 +13,7 @@ class ReviewSerializer(serializers.ModelSerializer):
 
 class WatchListSerializer(serializers.ModelSerializer):
     reviews = ReviewSerializer(read_only=True, many=True)
+    platform = serializers.CharField(source="platform.name")
     #Adding another field
     #len_name = serializers.SerializerMethodField()
 
