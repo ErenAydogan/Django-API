@@ -26,6 +26,7 @@ from .throttling                        import      ReviewCreateThrottle, Review
 
 from django_filters.rest_framework      import      DjangoFilterBackend
 from rest_framework                     import      filters
+from .pagination                        import      WatchlistPagination, WatchlistLOPagination, WatchlistCPagination
 
 
 
@@ -282,8 +283,12 @@ class WatchDetailAV(APIView):
 class WatchListGV(generics.ListAPIView):
     queryset = WatchList.objects.all()
     serializer_class = WatchListSerializer
-    filter_backends = [filters.OrderingFilter]
-    search_fields = ['avg_rating', 'title']
+    pagination_class = WatchlistCPagination
+
+    #pagination_class = WatchlistLOPagination
+    #pagination_class = WatchlistPagination
+    #filter_backends = [filters.OrderingFilter]
+    #search_fields = ['avg_rating', 'title']
 
 
 
