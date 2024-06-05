@@ -28,6 +28,8 @@ from django_filters.rest_framework      import      DjangoFilterBackend
 from rest_framework                     import      filters
 from .pagination                        import      WatchlistPagination, WatchlistLOPagination, WatchlistCPagination
 
+from rest_framework.renderers           import      JSONRenderer
+
 
 
 @api_view(['POST',])
@@ -284,6 +286,7 @@ class WatchListGV(generics.ListAPIView):
     queryset = WatchList.objects.all()
     serializer_class = WatchListSerializer
     pagination_class = WatchlistCPagination
+    renderer_classes = [JSONRenderer]
 
     #pagination_class = WatchlistLOPagination
     #pagination_class = WatchlistPagination

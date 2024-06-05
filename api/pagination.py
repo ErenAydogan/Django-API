@@ -15,4 +15,5 @@ class WatchlistLOPagination(LimitOffsetPagination):
 
 class WatchlistCPagination(CursorPagination):
     page_size = 2
-    ordering = "-created"
+    ordering = "created"
+    cursor_query_param = "record"
